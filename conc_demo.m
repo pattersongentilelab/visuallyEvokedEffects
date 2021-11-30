@@ -10,14 +10,15 @@ function [Tbl_demographics] = conc_demo(Tbl)
     
     age_control = Tbl.Age(Tbl.Type=='Control');
     age_case = Tbl.Age(Tbl.Type=='Case');
-    Acontrol = [num2str(mean(age_control)) ' [' num2str(min(age_control)) ' - ' num2str(max(age_control)) ']'];
-    Acase = [num2str(mean(age_case)) ' [' num2str(min(age_case)) ' - ' num2str(max(age_case)) ']'];
-    [~,p] = ttest2(Tbl.Age(Tbl.Type=='Control'),Tbl.Age(Tbl.Type=='Case'));
-    Astats = ['p = ' num2str(p)];
+    Acontrol = [num2str(median(age_control)) ' [' num2str(min(age_control)) ' - ' num2str(max(age_control)) ']'];
+    Acase = [num2str(median(age_case)) ' [' num2str(min(age_case)) ' - ' num2str(max(age_case)) ']'];
+    [p,tbl,~] = kruskalwallis(Tbl.Age,Tbl.Type,'off');
+    chi = cell2mat(tbl(2,5));
+    Astats = ['chi squared = ' num2str(chi) ', p = ' num2str(p)];
 
     dayspost_case = Tbl.DaysPostInjury(Tbl.Type=='Case');
     Dcontrol = '--';
-    Dcase = [num2str(mean(dayspost_case)) ' [' num2str(min(dayspost_case)) ' - ' num2str(max(dayspost_case)) ']'];
+    Dcase = [num2str(median(dayspost_case)) ' [' num2str(min(dayspost_case)) ' - ' num2str(max(dayspost_case)) ']'];
     Dstats = '--';
 
     Mhx_control = 100*length(Tbl.Type(Tbl.Migraine_Hx == 1 & Tbl.Type=='Control'))./length(Tbl.Migraine_Hx(Tbl.Type=='Control'));

@@ -21,13 +21,13 @@ function [Tbl_demographics] = conc_demo4(Tbl)
     age_eye = Tbl.Age(Tbl.MCAtype==1);
     age_brain = Tbl.Age(Tbl.MCAtype==2);
     
-    Anone = [num2str(mean(age_none)) ' [' num2str(min(age_none)) ' - ' num2str(max(age_none)) ']'];
-    Aeye = [num2str(mean(age_eye)) ' [' num2str(min(age_eye)) ' - ' num2str(max(age_eye)) ']'];
-    Abrain = [num2str(mean(age_brain)) ' [' num2str(min(age_brain)) ' - ' num2str(max(age_brain)) ']'];
+    Anone = [num2str(median(age_none)) ' [' num2str(min(age_none)) ' - ' num2str(max(age_none)) ']'];
+    Aeye = [num2str(median(age_eye)) ' [' num2str(min(age_eye)) ' - ' num2str(max(age_eye)) ']'];
+    Abrain = [num2str(median(age_brain)) ' [' num2str(min(age_brain)) ' - ' num2str(max(age_brain)) ']'];
     
     if length(unique(Tbl.MCAtype))>3
         age_both = Tbl.Age(Tbl.MCAtype==3);
-        Aboth = [num2str(mean(age_both)) ' [' num2str(min(age_both)) ' - ' num2str(max(age_both)) ']'];
+        Aboth = [num2str(median(age_both)) ' [' num2str(min(age_both)) ' - ' num2str(max(age_both)) ']'];
     end
     
     [p,tbl,~] = kruskalwallis(Tbl.Age,Tbl.MCAtype,'off');
@@ -56,13 +56,13 @@ function [Tbl_demographics] = conc_demo4(Tbl)
         dayspost_eye = Tbl.DaysPostInjury(Tbl.Type=='Case' & Tbl.MCAtype==1);
         dayspost_brain = Tbl.DaysPostInjury(Tbl.Type=='Case' & Tbl.MCAtype==2);
         
-        Dnone = [num2str(mean(dayspost_none)) ' [' num2str(min(dayspost_none)) ' - ' num2str(max(dayspost_none)) ']'];
-        Deye = [num2str(mean(dayspost_eye)) ' [' num2str(min(dayspost_eye)) ' - ' num2str(max(dayspost_eye)) ']'];
-        Dbrain = [num2str(mean(dayspost_brain)) ' [' num2str(min(dayspost_brain)) ' - ' num2str(max(dayspost_brain)) ']'];
+        Dnone = [num2str(median(dayspost_none)) ' [' num2str(min(dayspost_none)) ' - ' num2str(max(dayspost_none)) ']'];
+        Deye = [num2str(median(dayspost_eye)) ' [' num2str(min(dayspost_eye)) ' - ' num2str(max(dayspost_eye)) ']'];
+        Dbrain = [num2str(median(dayspost_brain)) ' [' num2str(min(dayspost_brain)) ' - ' num2str(max(dayspost_brain)) ']'];
         
         if length(unique(Tbl.MCAtype))>3
             dayspost_both = Tbl.DaysPostInjury(Tbl.Type=='Case' & Tbl.MCAtype==3);
-            Dboth = [num2str(mean(dayspost_both)) ' [' num2str(min(dayspost_both)) ' - ' num2str(max(dayspost_both)) ']'];
+            Dboth = [num2str(median(dayspost_both)) ' [' num2str(min(dayspost_both)) ' - ' num2str(max(dayspost_both)) ']'];
         end
         
         [p,tbl,~] = kruskalwallis(Tbl.DaysPostInjury,Tbl.MCAtype,'off');
@@ -150,10 +150,10 @@ function [Tbl_demographics] = conc_demo4(Tbl)
     
     subplot(3,3,2)
     hold on
-    none = calc95Boot(Tbl.Age(Tbl.MCAtype==0),1);
-    eye = calc95Boot(Tbl.Age(Tbl.MCAtype==1),1);
+    none = calc95Boot(Tbl.Age(Tbl.MCAtype==0),2);
+    eye = calc95Boot(Tbl.Age(Tbl.MCAtype==1),2);
     if length(Tbl.Age(Tbl.MCAtype==2))>1
-        brain = calc95Boot(Tbl.Age(Tbl.MCAtype==2),1);
+        brain = calc95Boot(Tbl.Age(Tbl.MCAtype==2),2);
     else
         brain = [Tbl.Age(Tbl.MCAtype==2);Tbl.Age(Tbl.MCAtype==2);Tbl.Age(Tbl.MCAtype==2)];
     end
@@ -161,7 +161,7 @@ function [Tbl_demographics] = conc_demo4(Tbl)
     errorbar(2,eye(2,:),abs(diff(eye(1:2,:))),abs(diff(eye(2:3,:))),'o','Color',[0.4 0.4 0.4],'MarkerFaceColor',[0.4 0.4 0.4])
     errorbar(3,brain(2,:),abs(diff(brain(1:2,:))),abs(diff(brain(2:3,:))),'o','Color',[0.1 0.1 0.1],'MarkerFaceColor',[0.1 0.1 0.1])
     if length(unique(Tbl.MCAtype))>3
-        both = calc95Boot(Tbl.Age(Tbl.MCAtype==3),1);
+        both = calc95Boot(Tbl.Age(Tbl.MCAtype==3),2);
         errorbar(4,both(2,:),abs(diff(both(1:2,:))),abs(diff(both(2:3,:))),'o','Color',[0 0 0],'MarkerFaceColor',[0 0 0])
     end
     ax = gca; ax.TickDir = 'out'; ax.Box = 'off'; ax.XLim = [0 5];
@@ -216,16 +216,16 @@ function [Tbl_demographics] = conc_demo4(Tbl)
 if ~isempty(Tbl(Tbl.Type=='Case',:))    
     subplot(3,3,8)
     hold on
-    none = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==0 & Tbl.Type=='Case'),1);
-    eye = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==1 & Tbl.Type=='Case'),1);
-    brain = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==2 & Tbl.Type=='Case'),1);
+    none = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==0 & Tbl.Type=='Case'),2);
+    eye = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==1 & Tbl.Type=='Case'),2);
+    brain = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==2 & Tbl.Type=='Case'),2);
     
     errorbar(1,none(2,:),abs(diff(none(1:2,:))),abs(diff(none(2:3,:))),'o','Color',[0.7 0.7 0.7],'MarkerFaceColor',[0.7 0.7 0.7])
     errorbar(2,eye(2,:),abs(diff(eye(1:2,:))),abs(diff(eye(2:3,:))),'o','Color',[0.4 0.4 0.4],'MarkerFaceColor',[0.4 0.4 0.4])
     errorbar(3,brain(2,:),abs(diff(brain(1:2,:))),abs(diff(brain(2:3,:))),'o','Color',[0.1 0.1 0.1],'MarkerFaceColor',[0.1 0.1 0.1])
     
     if length(unique(Tbl.MCAtype))>3
-        both = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==3 & Tbl.Type=='Case'),1);
+        both = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==3 & Tbl.Type=='Case'),2);
         errorbar(4,both(2,:),abs(diff(both(1:2,:))),abs(diff(both(2:3,:))),'o','Color',[0 0 0],'MarkerFaceColor',[0 0 0])
     end
     ax = gca; ax.TickDir = 'out'; ax.Box = 'off'; ax.XLim = [0 5];
