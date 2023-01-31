@@ -65,8 +65,8 @@ function [Tbl_demographics] = conc_demo(Tbl)
     
     PCSI_control = Tbl.PCSI_score_total(Tbl.Type=='Control');
     PCSI_case = Tbl.PCSI_score_total(Tbl.Type=='Case');
-    PCSI95_control = calc95Boot(PCSI_control,2); 
-    PCSI95_case = calc95Boot(PCSI_case,2);
+    PCSI95_control = calc95boot(PCSI_control,2); 
+    PCSI95_case = calc95boot(PCSI_case,2);
     PCSIcontrol = [num2str(PCSI95_control(2,:)) ' [' num2str(PCSI95_control(1,:)) ' - ' num2str(PCSI95_control(3,:)) ']'];
     PCSIcase = [num2str(PCSI95_case(2,:)) ' [' num2str(PCSI95_case(1,:)) ' - ' num2str(PCSI95_case(3,:)) ']'];
     [p,tbl,~] = kruskalwallis(Tbl.PCSI_score_total,Tbl.Type,'off');

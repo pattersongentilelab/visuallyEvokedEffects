@@ -150,10 +150,10 @@ function [Tbl_demographics] = conc_demo4(Tbl)
     
     subplot(3,3,2)
     hold on
-    none = calc95Boot(Tbl.Age(Tbl.MCAtype==0),2);
-    eye = calc95Boot(Tbl.Age(Tbl.MCAtype==1),2);
+    none = calc95boot(Tbl.Age(Tbl.MCAtype==0),2);
+    eye = calc95boot(Tbl.Age(Tbl.MCAtype==1),2);
     if length(Tbl.Age(Tbl.MCAtype==2))>1
-        brain = calc95Boot(Tbl.Age(Tbl.MCAtype==2),2);
+        brain = calc95boot(Tbl.Age(Tbl.MCAtype==2),2);
     else
         brain = [Tbl.Age(Tbl.MCAtype==2);Tbl.Age(Tbl.MCAtype==2);Tbl.Age(Tbl.MCAtype==2)];
     end
@@ -161,7 +161,7 @@ function [Tbl_demographics] = conc_demo4(Tbl)
     errorbar(2,eye(2,:),abs(diff(eye(1:2,:))),abs(diff(eye(2:3,:))),'o','Color',[0.4 0.4 0.4],'MarkerFaceColor',[0.4 0.4 0.4])
     errorbar(3,brain(2,:),abs(diff(brain(1:2,:))),abs(diff(brain(2:3,:))),'o','Color',[0.1 0.1 0.1],'MarkerFaceColor',[0.1 0.1 0.1])
     if length(unique(Tbl.MCAtype))>3
-        both = calc95Boot(Tbl.Age(Tbl.MCAtype==3),2);
+        both = calc95boot(Tbl.Age(Tbl.MCAtype==3),2);
         errorbar(4,both(2,:),abs(diff(both(1:2,:))),abs(diff(both(2:3,:))),'o','Color',[0 0 0],'MarkerFaceColor',[0 0 0])
     end
     ax = gca; ax.TickDir = 'out'; ax.Box = 'off'; ax.XLim = [0 5];
@@ -216,16 +216,16 @@ function [Tbl_demographics] = conc_demo4(Tbl)
 if ~isempty(Tbl(Tbl.Type=='Case',:))    
     subplot(3,3,8)
     hold on
-    none = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==0 & Tbl.Type=='Case'),2);
-    eye = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==1 & Tbl.Type=='Case'),2);
-    brain = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==2 & Tbl.Type=='Case'),2);
+    none = calc95boot(Tbl.DaysPostInjury(Tbl.MCAtype==0 & Tbl.Type=='Case'),2);
+    eye = calc95boot(Tbl.DaysPostInjury(Tbl.MCAtype==1 & Tbl.Type=='Case'),2);
+    brain = calc95boot(Tbl.DaysPostInjury(Tbl.MCAtype==2 & Tbl.Type=='Case'),2);
     
     errorbar(1,none(2,:),abs(diff(none(1:2,:))),abs(diff(none(2:3,:))),'o','Color',[0.7 0.7 0.7],'MarkerFaceColor',[0.7 0.7 0.7])
     errorbar(2,eye(2,:),abs(diff(eye(1:2,:))),abs(diff(eye(2:3,:))),'o','Color',[0.4 0.4 0.4],'MarkerFaceColor',[0.4 0.4 0.4])
     errorbar(3,brain(2,:),abs(diff(brain(1:2,:))),abs(diff(brain(2:3,:))),'o','Color',[0.1 0.1 0.1],'MarkerFaceColor',[0.1 0.1 0.1])
     
     if length(unique(Tbl.MCAtype))>3
-        both = calc95Boot(Tbl.DaysPostInjury(Tbl.MCAtype==3 & Tbl.Type=='Case'),2);
+        both = calc95boot(Tbl.DaysPostInjury(Tbl.MCAtype==3 & Tbl.Type=='Case'),2);
         errorbar(4,both(2,:),abs(diff(both(1:2,:))),abs(diff(both(2:3,:))),'o','Color',[0 0 0],'MarkerFaceColor',[0 0 0])
     end
     ax = gca; ax.TickDir = 'out'; ax.Box = 'off'; ax.XLim = [0 5];
@@ -235,10 +235,10 @@ end
     
     subplot(3,3,9)
     hold on
-    nonePCSI = calc95Boot(Tbl.PCSI_score_total(Tbl.MCAtype==0),2);
-    eyePCSI = calc95Boot(Tbl.PCSI_score_total(Tbl.MCAtype==1),2);
+    nonePCSI = calc95boot(Tbl.PCSI_score_total(Tbl.MCAtype==0),2);
+    eyePCSI = calc95boot(Tbl.PCSI_score_total(Tbl.MCAtype==1),2);
     if length(Tbl.Type(Tbl.MCAtype==2))>1
-        brainPCSI = calc95Boot(Tbl.PCSI_score_total(Tbl.MCAtype==2),2);
+        brainPCSI = calc95boot(Tbl.PCSI_score_total(Tbl.MCAtype==2),2);
     else
         brainPCSI = [Tbl.PCSI_score_total(Tbl.MCAtype==2);Tbl.PCSI_score_total(Tbl.MCAtype==2 & Tbl.Type=='Control');Tbl.PCSI_score_total(Tbl.MCAtype==2 & Tbl.Type=='Control')];
     end
@@ -248,7 +248,7 @@ end
     errorbar(1.8,eyePCSI(2,:),abs(diff(eyePCSI(1:2,:))),abs(diff(eyePCSI(2:3,:))),'o','Color',[0.4 0.4 0.4],'MarkerFaceColor',[0.4 0.4 0.4])
     errorbar(2.8,brainPCSI(2,:),abs(diff(brainPCSI(1:2,:))),abs(diff(brainPCSI(2:3,:))),'o','Color',[0.1 0.1 0.1],'MarkerFaceColor',[0.1 0.1 0.1])
     if length(unique(Tbl.MCAtype))>3
-        bothPCSI = calc95Boot(Tbl.PCSI_score_total(Tbl.MCAtype==3),2);
+        bothPCSI = calc95boot(Tbl.PCSI_score_total(Tbl.MCAtype==3),2);
         errorbar(3.8,bothPCSI(2,:),abs(diff(bothPCSI(1:2,:))),abs(diff(bothPCSI(2:3,:))),'o','Color',[0 0 0],'MarkerFaceColor',[0 0 0])
     end
     ax = gca; ax.TickDir = 'out'; ax.Box = 'off'; ax.XLim = [0 5];

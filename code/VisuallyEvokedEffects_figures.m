@@ -3,7 +3,9 @@
 % effects (including MCA), PCSI scores, and visual-ocular-motor task repetitions. 
 % Includes statistical analysis.
 
-load visuallyEvokedEffects_data
+MindsMatter_dataBasePath = getpref('visuallyEvokedEffects','MindsMatter_DataPath');
+
+load([MindsMatter_dataBasePath '/visuallyEvokedEffects/visuallyEvokedEffects_data'])
 
 %% Multiple correspondence analysis of signs and symptoms
 
@@ -61,7 +63,7 @@ end
 % (https://www.mathworks.com/matlabcentral/fileexchange/22154-multiple-correspondence-analysis-based-on-the-indicator-matrix), 
 % MATLAB Central File Exchange.
 
-load MCAmodel_No_othsx092421_voms % File that contains MCA model
+load([MindsMatter_dataBasePath '/visuallyEvokedEffects/MCAmodel_No_othsx092421_voms']) % File that contains MCA model
 
 % Calculate MCA scores
 MCA_no=2;
@@ -130,10 +132,10 @@ plot(Tbl.MCAsxPresent(Tbl.Type=='Case'),Tbl.MCAsxEyeBrain(Tbl.Type=='Case'),'or'
 plot(Tbl.MCAsxPresent(Tbl.Type=='Control'),Tbl.MCAsxEyeBrain(Tbl.Type=='Control'),'ob','MarkerFaceColor','b','MarkerSize',6)
 plot([-2 6],[0 0],'--b')
 plot([0 0],[-4 6],'--b')
-MCA1_case = calc95Boot(Tbl.MCAsxPresent(Tbl.Type=='Case'),1);
-MCA1_control = calc95Boot(Tbl.MCAsxPresent(Tbl.Type=='Control'),1);
-MCA2_case = calc95Boot(Tbl.MCAsxEyeBrain(Tbl.Type=='Case'),1);
-MCA2_control = calc95Boot(Tbl.MCAsxEyeBrain(Tbl.Type=='Control'),1);
+MCA1_case = calc95boot(Tbl.MCAsxPresent(Tbl.Type=='Case'),1);
+MCA1_control = calc95boot(Tbl.MCAsxPresent(Tbl.Type=='Control'),1);
+MCA2_case = calc95boot(Tbl.MCAsxEyeBrain(Tbl.Type=='Case'),1);
+MCA2_control = calc95boot(Tbl.MCAsxEyeBrain(Tbl.Type=='Control'),1);
 errorbar(MCA1_case(2,:),MCA2_case(2,:),abs(diff(MCA2_case(1:2,:))),abs(diff(MCA2_case(2:3,:))),abs(diff(MCA1_case(1:2,:))),abs(diff(MCA1_case(2:3,:))),'or','MarkerFaceColor','r')
 errorbar(MCA1_control(2,:),MCA2_control(2,:),abs(diff(MCA2_control(1:2,:))),abs(diff(MCA2_control(2:3,:))),abs(diff(MCA1_control(1:2,:))),abs(diff(MCA1_control(2:3,:))),'ob','MarkerFaceColor','b')
 ax = gca; ax.TickDir = 'out'; ax.Box = 'off';

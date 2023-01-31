@@ -9,21 +9,21 @@ MCAcat = {'None','Eye sx','Brain sx','Both'};
         caseVOMS_eye = VOM(Tbl.MCAtype==1 & Tbl.Type == 'Case');
         caseVOMS_brain = VOM(Tbl.MCAtype==2 & Tbl.Type == 'Case');
         
-        case_Vn = calc95Boot(caseVOMS_none,1);
-        case_Ve = calc95Boot(caseVOMS_eye,1);
-        case_Vbr = calc95Boot(caseVOMS_brain,1);
+        case_Vn = calc95boot(caseVOMS_none,1);
+        case_Ve = calc95boot(caseVOMS_eye,1);
+        case_Vbr = calc95boot(caseVOMS_brain,1);
         
         if unique(Tbl.MCAtype)>3
             caseVOMS_both = VOM(Tbl.MCAtype==3 & Tbl.Type == 'Case');
-            case_Vbo = calc95Boot(caseVOMS_both,1);
+            case_Vbo = calc95boot(caseVOMS_both,1);
         end
 
         contVOMS_none = VOM(Tbl.MCAtype==0 & Tbl.Type == 'Control');
         contVOMS_eye = VOM(Tbl.MCAtype==1 & Tbl.Type == 'Control');
         contVOMS_br = VOM(Tbl.MCAtype==2 & Tbl.Type == 'Control');
 
-        cont_Vn = calc95Boot(contVOMS_none,1);
-        cont_Ve = calc95Boot(contVOMS_eye,1);
+        cont_Vn = calc95boot(contVOMS_none,1);
+        cont_Ve = calc95boot(contVOMS_eye,1);
         cont_Vbr = [contVOMS_br;contVOMS_br;contVOMS_br];
         
 
