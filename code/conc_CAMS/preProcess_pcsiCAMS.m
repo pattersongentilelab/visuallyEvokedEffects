@@ -55,7 +55,12 @@ mm.DifficultyThinking = sum([data.teenPCSI_slowed data.teenPCSI_mentfoggy...
 mm.DifficultyThinking(isnan(mm.DifficultyThinking)) = sum([data.childPCSI_thinkslow(isnan(mm.DifficultyThinking)) data.childPCSI_mentfoggy(isnan(mm.DifficultyThinking))...
     data.childPCSI_diffconc(isnan(mm.DifficultyThinking)) data.childPCSI_diffremem(isnan(mm.DifficultyThinking))],2);
 mm.DifficultyThinking(mm.DifficultyThinking>0) = 1;
-mm.aSx = sum([mm.Nausea mm.Balance mm.Dizziness mm.LightSens mm.SoundSens mm.VisualProblem mm.DifficultyThinking],2);
+mm.Fatigue = data.teenPCSI_fatigue;
+mm.Fatigue(isnan(mm.Fatigue)) = data.childPCSI_fatigue(isnan(mm.Fatigue));
+mm.Fatigue(mm.Fatigue>0) = 1;
+mm.aSx = sum([mm.Nausea mm.Balance mm.Dizziness mm.LightSens mm.SoundSens mm.VisualProblem mm.DifficultyThinking mm.Fatigue],2);
+mm.TotalPCSI = data.teenPCSI_score_total;
+mm.TotalPCSI(isnan(mm.TotalPCSI)) = data.childPCSI_score_total(isnan(mm.TotalPCSI));
 
 % pre-injury
 mm.Headache2 = data.pcsi_headache_p1;
@@ -87,17 +92,21 @@ mm.DifficultyThinking2 = sum([data.pcsi_slowed_p14 data.pcsi_mentfoggy_p15...
 mm.DifficultyThinking2(isnan(mm.DifficultyThinking2)) = sum([str2double(data.cpcsi_thinkslow_p13(isnan(mm.DifficultyThinking2))) str2double(data.cpcsi_mentfoggy_p14(isnan(mm.DifficultyThinking2)))...
     str2double(data.cpcsi_diffconc_p5(isnan(mm.DifficultyThinking2))) str2double(data.cpcsi_diffremem_p16(isnan(mm.DifficultyThinking2)))],2);
 mm.DifficultyThinking2(mm.DifficultyThinking2>0) = 1;
-mm.aSx2 = sum([mm.Nausea2 mm.Balance2 mm.Dizziness2 mm.LightSens2 mm.SoundSens2 mm.VisualProblem2 mm.DifficultyThinking2],2);
+mm.Fatigue2 = data.pcsi_fatigue_p5;
+mm.Fatigue2(isnan(mm.Fatigue2)) = str2double(data.cpcsi_fatigue_p15(isnan(mm.Fatigue2)));
+mm.Fatigue2(mm.Fatigue2>0) = 1;
+mm.aSx2 = sum([mm.Nausea2 mm.Balance2 mm.Dizziness2 mm.LightSens2 mm.SoundSens2 mm.VisualProblem2 mm.DifficultyThinking2 mm.Fatigue2],2);
+mm.TotalPCSI2 = data.pcsi_total_preinj;
+mm.TotalPCSI2(isnan(mm.TotalPCSI)) = str2double(data.cpcsi_score_preinjury(isnan(mm.TotalPCSI)));
 
 % Select participants
 mm = mm(mm.DaysPost<=360 & mm.Age>=7 & mm.Age<22,:);
 
-mmPre = mm(:,[1:9 19:27]);
+mmPre = mm(:,[1:9 21:31]);
 mmPre = mmPre(~isnan(mmPre.aSx2),:);
 mmPre.Group = categorical(cellstr(repmat('pre-injury',height(mmPre),1)));
-% randi(height(mm),[300 1])
 
-mmPost = mm(:,1:18);
+mmPost = mm(:,1:20);
 mmPost = mmPost(~isnan(mmPost.aSx),:);
 mmPost.Group = categorical(cellstr(repmat('post-injury',height(mmPost),1)));
 
@@ -105,15 +114,15 @@ mmPre.Properties.VariableNames = mmPost.Properties.VariableNames;
 mmPrePost = [mmPre;mmPost];
 
 % determine train and validation sets for pre- and post-injury
-mmPrePost.model = zeros(height(mmPrePost),1);
-trainPre = mmPrePost.uniqueID(mmPrePost.ConcNum==0 & mmPrePost.HAdx=='none' & mmPrePost.Group=='pre-injury');
-rand_select = randperm(length(trainPre));
-trainPre = trainPre(rand_select(1:80));
-mmPrePost.model(ismember(mmPrePost.uniqueID,trainPre)==1 & mmPrePost.Group=='pre-injury') = ones(80,1);
-trainPost = mmPrePost.uniqueID(mmPrePost.ConcNum==0 & mmPrePost.HAdx=='none' & mmPrePost.Group=='post-injury' & ~ismember(mmPrePost.uniqueID,trainPre));
+trainPost = mmPrePost.uniqueID(mmPrePost.ConcNum==0 & mmPrePost.HAdx=='none' & mmPrePost.Group=='post-injury');
 rand_select = randperm(length(trainPost));
-trainPost = trainPost(rand_select(1:80));
-mmPrePost.model(ismember(mmPrePost.uniqueID,trainPost)==1 & mmPrePost.Group=='post-injury') = ones(80,1);
+trainPost = trainPost(rand_select(1:85));
+mmPrePost.model = zeros(height(mmPrePost),1);
+trainPre = mmPrePost.uniqueID(mmPrePost.ConcNum==0 & mmPrePost.HAdx=='none' & mmPrePost.Group=='pre-injury' & ~ismember(mmPrePost.uniqueID,trainPost));
+rand_select = randperm(length(trainPre));
+trainPre = trainPre(rand_select(1:85));
+mmPrePost.model(ismember(mmPrePost.uniqueID,trainPre)==1 & mmPrePost.Group=='pre-injury') = ones(85,1);
+mmPrePost.model(ismember(mmPrePost.uniqueID,trainPost)==1 & mmPrePost.Group=='post-injury') = ones(85,1);
 mmPrePost.model = categorical(mmPrePost.model,[1 0],{'train','validate'});
 
 clear data
@@ -157,7 +166,9 @@ ha.SoundSens(data.p_trigger___noises==1) = 1;
 ha.VisualProblem = data.p_assoc_sx_vis___blur;
 ha.VisualProblem(data.p_assoc_sx_vis___double_vis==1) = 1;
 ha.DifficultyThinking = data.p_assoc_sx_oth_sx___think;
-ha.aSx = sum([ha.Nausea ha.Balance ha.Dizziness ha.LightSens ha.SoundSens ha.VisualProblem ha.DifficultyThinking],2);
+ha.Fatigue = data.p_overall_prob___fatigue;
+ha.aSx = sum([ha.Nausea ha.Balance ha.Dizziness ha.LightSens ha.SoundSens ha.VisualProblem ha.DifficultyThinking ha.Fatigue],2);
+ha.TotalPCSI = NaN*ones(height(ha),1);
 ha.Group = categorical(cellstr(repmat('headache',height(ha),1)));
 
 ha = ha(ha.Age>=7 & ha.Age<22 & data.visit_dt>='2022-11-01' & (ha.HAdx=='migraine'|ha.HAdx=='prob_migraine'|ha.HAdx=='chronic_migraine'|ha.HAdx=='tth'|ha.HAdx=='chronic_tth'),:);
@@ -167,12 +178,12 @@ ha = ha(ha.Age>=7 & ha.Age<22 & data.visit_dt>='2022-11-01' & (ha.HAdx=='migrain
 ha.model = zeros(height(ha),1);
 trainHA = ha.uniqueID(ha.HAdx=='migraine'|ha.HAdx=='prob_migraine');
 rand_select = randperm(length(trainHA));
-trainHA = trainHA(rand_select(1:80));
-ha.model(ismember(ha.uniqueID,trainHA)==1) = ones(80,1);
+trainHA = trainHA(rand_select(1:85));
+ha.model(ismember(ha.uniqueID,trainHA)==1) = ones(85,1);
 ha.model = categorical(ha.model,[1 0],{'train','validate'});
 clear data
 
 %% combine datasets
-all = [mmPrePost(:,1:20);ha(:,1:20)];
+all = [mmPrePost(:,1:22);ha(:,1:22)];
 
 save([MindsMatter_dataBasePath '/cams/processedPCSI'],'all')
