@@ -281,3 +281,6 @@ tth_HAhx2 = sort(bootstrp(1000,@mean,all.MCA2_aSx(all.HAdxSimple=='tth' & all.Gr
 errorbar(tth_HAhx1(500),tth_HAhx2(500),abs(diff(tth_HAhx2([25 500]))),abs(diff(tth_HAhx2([500 975]))),abs(diff(tth_HAhx1([25 500]))),abs(diff(tth_HAhx1([500 975]))),'+y')
 
 ax = gca; ax.TickDir = 'out'; ax.Box = 'off';
+
+
+save([MindsMatter_dataBasePath '/cams/allCAMS'],'all')
