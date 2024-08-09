@@ -125,12 +125,7 @@ trainPost = mmPrePost.uniqueID(mmPrePost.ConcHx==0 & mmPrePost.HAdx=='none' & mm
 rand_select = randperm(length(trainPost));
 trainPost = trainPost(rand_select(1:200));
 mmPrePost.model = zeros(height(mmPrePost),1);
-trainPre = mmPrePost.uniqueID(mmPrePost.ConcHx==0 & mmPrePost.HAdx=='none' & mmPrePost.Group=='pre-injury' & mmPrePost.TotalPCSI<7 & ~ismember(mmPrePost.uniqueID,trainPost));
-rand_select = randperm(length(trainPre));
-trainPre = trainPre(rand_select(1:200));
-mmPrePost.model(ismember(mmPrePost.uniqueID,trainPre)==1 & mmPrePost.Group=='pre-injury') = ones(200,1);
 mmPrePost.model(ismember(mmPrePost.uniqueID,trainPost)==1 & mmPrePost.Group=='post-injury') = ones(200,1);
-mmPrePost.model = categorical(mmPrePost.model,[1 0],{'train','validate'});
 
 clear data
 
@@ -172,6 +167,7 @@ ha.Age = floor(data.age);
 % ha.RaceEth = categorical(ha.RaceEth,[1 2 4 3 5 6 7 0],{'White','Black','Asian','Hispanic','More than 1 race','Other','Unknown','NR'});
 ha.DaysPost = NaN*ones(height(ha),1);
 ha.HAdx = ICHD3.dx;
+ha.HAdx(ha.HAdx=='chronic_migraine' & ICHD3.pheno=='prob_chronic_migraine') = 'prob_chronic_migraine';
 ha.FamMigraine = NaN*ones(height(ha),1);
 ha.ConcHx =  NaN*ones(height(ha),1);
 ha.Headache = data.p_sev_overall;
@@ -192,19 +188,74 @@ ha.aSx = sum([ha.Nausea ha.Balance ha.Dizziness ha.LightSens ha.SoundSens ha.Vis
 ha.TotalPCSI = NaN*ones(height(ha),1);
 ha.Group = categorical(cellstr(repmat('headache',height(ha),1)));
 
-ha = ha(ha.Age>=13 & ha.Age<=18 & data.visit_dt>='2022-11-01' & (ha.HAdx=='migraine'|ha.HAdx=='prob_migraine'|ha.HAdx=='chronic_migraine'|ha.HAdx=='tth'|ha.HAdx=='chronic_tth'),:);
+
+ha = ha(ha.Age>=13 & ha.Age<=18 & data.visit_dt>='2022-11-01' & (ha.HAdx=='migraine'|ha.HAdx=='prob_migraine'|ha.HAdx=='chronic_migraine'|ha.HAdx=='prob_chronic_migraine'|ha.HAdx=='tth'|ha.HAdx=='chronic_tth'),:);
 
 
-% determine train and validation sets for headache
+% match train and validate data for headache
+% matches to age, sex
+
+train = mmPrePost(mmPrePost.model==1,:);
+trainPre = mmPrePost(mmPrePost.ConcHx==0 & mmPrePost.HAdx=='none' & mmPrePost.Group=='pre-injury' & mmPrePost.TotalPCSI<7 & ~ismember(mmPrePost.uniqueID,trainPost),:);
+matchPre_ID = NaN*ones(200,1);
+counter = 0;
+x = 1;
+while x<=height(train)
+    counter = counter+1;
+    tempF = train(counter,:);   
+    tempM = trainPre(trainPre.Sex==tempF.Sex & trainPre.Age==tempF.Age,:);
+   
+    if isempty(tempM)
+        disp('no match pre')
+       continue
+    end
+        temp_match = tempM.uniqueID(randi(height(tempM),1));
+        matchPre_ID(x) = temp_match;
+        
+        % remove case-control subjects from pool
+        trainPre = trainPre(trainPre.uniqueID~=temp_match,:);  
+    clear temp* 
+    x = x+1;   
+    if counter==height(train)
+        break
+    end
+end
+
+mmPrePost.model(ismember(mmPrePost.uniqueID,categorical(matchPre_ID))==1 & mmPrePost.Group=='pre-injury') = 1;
+mmPrePost.model = categorical(mmPrePost.model,[1 0],{'train','validate'});
+
+trainHA = ha(ha.HAdx=='migraine'|ha.HAdx=='chronic_migraine',:);
+counter = 0;
+match_HA = trainHA(1,:);
+x = 1;
+while x<=height(train)
+    counter = counter+1;
+    tempF = train(counter,:);   
+    tempM = trainHA(trainHA.Sex==tempF.Sex & trainHA.Age==tempF.Age,:);
+   
+    if isempty(tempM)
+        disp('no match ha')
+       continue
+    end
+        temp_match = tempM(randi(height(tempM),1),:);
+        match_HA(x,:) = temp_match;
+        
+        % remove case-control subjects from pool
+        trainHA = trainHA(trainHA.uniqueID~=temp_match.uniqueID,:);
+    clear temp* 
+    x = x+1;
+    if counter==height(train)
+        break
+    end
+end
+
 ha.model = zeros(height(ha),1);
-trainHA = ha.uniqueID(ha.HAdx=='migraine');
-rand_select = randperm(length(trainHA));
-trainHA = trainHA(rand_select(1:200));
-ha.model(ismember(ha.uniqueID,trainHA)==1) = ones(200,1);
+ha.model(ismember(ha.uniqueID,match_HA.uniqueID)) = 1;
 ha.model = categorical(ha.model,[1 0],{'train','validate'});
 clear data
+
 
 %% combine datasets
 all = [mmPrePost(:,1:21);ha(:,1:21)];
 
-save([MindsMatter_dataBasePath '/cams/processedPCSI24'],'all')
+save([MindsMatter_dataBasePath '/cams/processedPCSI24matched'],'all')

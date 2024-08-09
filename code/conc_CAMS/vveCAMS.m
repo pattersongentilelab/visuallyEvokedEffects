@@ -3,7 +3,7 @@
 %% Load CAMS data
 MindsMatter_dataBasePath = getpref('visuallyEvokedEffects','MindsMatter_DataPath');
 load([MindsMatter_dataBasePath '/cams/allCAMS'],'all')
-
+addpath '/Users/pattersonc/Documents/MATLAB/commonFx'
 
 
 % Select only mind's matter post-injury participants (because they have VVE)

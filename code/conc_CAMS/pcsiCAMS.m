@@ -9,7 +9,7 @@ var_aSx_abs = char('no nausea','no balance problems','no dizziness','no light se
     'no difficulty thinking');
 
 MindsMatter_dataBasePath = getpref('visuallyEvokedEffects','MindsMatter_DataPath');
-load([MindsMatter_dataBasePath '/cams/processedPCSI24'],'all')
+load([MindsMatter_dataBasePath '/cams/processedPCSI24dxUpdate'],'all')
 
 MCA_no = size(var_aSx,1);
 
@@ -56,7 +56,7 @@ HA.MCA6_aSx = CAMSha.MCA_score(:,6);
 
 % calculate combined MCA
 Train = all(all.model=='train',:);
-CAMStrain = runCAMS(Train(:,10:16),var_aSx,var_aSx_abs,'Sn',Sn,'MCA_no',mca_num,'xBubble',100);
+CAMStrain = runCAMS(Train(:,10:16),var_aSx,var_aSx_abs,'Sn',Sn,'MCA_no',mca_num,'xBubble',60);
 Train.MCA1_aSx = CAMStrain.MCA_score(:,1);
 Train.MCA2_aSx = CAMStrain.MCA_score(:,2);
 Train.MCA3_aSx = CAMStrain.MCA_score(:,3);
@@ -154,6 +154,10 @@ genErr3 = kfoldLoss(CVmdl3);
 Mdl4 = fitcecoc(Train,'Group~MCA1_aSx+MCA2_aSx+MCA3_aSx+MCA4_aSx','Learners',Temp,'FitPosterior',true);
 CVmdl4 = crossval(Mdl4);
 genErr4 = kfoldLoss(CVmdl4);
+
+Mdl5 = fitcecoc(Train,'Group~MCA1_aSx+MCA2_aSx+MCA3_aSx+MCA4_aSx+MCA5_aSx','Learners',Temp,'FitPosterior',true);
+CVmdl5 = crossval(Mdl5);
+genErr5 = kfoldLoss(CVmdl5);
 
 
 
@@ -281,6 +285,10 @@ tth_HAhx2 = sort(bootstrp(1000,@mean,all.MCA2_aSx(all.HAdxSimple=='tth' & all.Gr
 errorbar(tth_HAhx1(500),tth_HAhx2(500),abs(diff(tth_HAhx2([25 500]))),abs(diff(tth_HAhx2([500 975]))),abs(diff(tth_HAhx1([25 500]))),abs(diff(tth_HAhx1([500 975]))),'+y')
 
 ax = gca; ax.TickDir = 'out'; ax.Box = 'off';
+
+%% plot CACMS 1 and 2 as a function of headache severity by group
+
+
 
 
 save([MindsMatter_dataBasePath '/cams/allCAMS'],'all')
